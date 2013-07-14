@@ -1,0 +1,718 @@
+<!doctype html>  
+<html lang="en">
+	
+	<head>
+		<meta charset="utf-8">
+		
+		<title>Deferreds</title>
+
+		<meta name="description" content="Alex McPherson's 2012 jQuery Conf San Francisco presentation">
+		<meta name="author" content="Alex McPherson">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+		
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/print.css" type="text/css" media="print">
+
+		<link rel="stylesheet" href="lib/zenburn.css">
+	</head>
+	
+	<body>
+		
+		<div class="reveal">
+
+			<!-- Used to fade in a background when a specific slide state is reached -->
+			<div class="state-background"></div>
+			
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1><span class='code'>.when()</span> to use deferreds</h1>
+					<h3 class="inverted">Alex McPherson - Quick Left</h3>
+				</section>
+				
+				<section>
+					<h2 class='code'>console.log(talkOutline);</h2>
+					<ul>
+						<li class='fragment'>I'm Alex, why you should listen to me</li>
+						<li class='fragment'>j@ubourg, and a little history</li>
+						<li class='fragment'>Code perusal</li>
+						<li class='fragment'>6 problems, 6 solutions</li>
+						<li class='fragment'>Keys to success</li>
+						<li class='fragment'>Questions</li>
+					</ul>
+				</section>
+				
+				<section>
+					<h2 class='code'>alex.define();</h2>
+					<h4>Who is this guy</h4>
+					
+					<section>
+						<h4 class='fragment'>Important, crucial, life-altering facts:</h4>
+						<ul>
+							<li class='fragment'>Sublime Text 2 || vim</li>
+							<li class='fragment'>Railscasts 2 colors</li>
+							<li class='fragment'>I prefer this:
+
+<pre>
+	<code>
+var presenter = {
+  name: 'Alex',
+  age:  28,
+  city: 'Boulder'
+};
+	</code>
+</pre>
+
+							</li>
+							<li class='fragment'>To this:
+<pre>
+	<code>
+var presenter = {
+  name:  'Alex'
+  ,age:  28
+  ,city: 'Boulder'
+};
+//Comma first is for the birds
+	</code>
+</pre>
+
+							</li>
+
+							<li class='fragment'>And I always put in my semicolons</li>
+						</ul>
+					</section>
+
+					<section>
+						<h4 class='fragment'>Personal:</h4>
+						<ul>
+							<li class='fragment'>Boston &rarr; Boulder</li>
+							<li class='fragment'>Quick Left
+								<ul>
+									<li class='fragment'>Front end engineer</li>
+									<li class='fragment'>Develops our training and apprenticeship programs</li>
+									<li class='fragment'>Teaches Ruby on Rails and JavaScript to grad students at CU - Boulder</li>
+								</ul>
+							</li>
+						</ul>
+					</section>
+				
+					<section>
+						<h4 class='fragment'>Skillsets:</h4>
+
+						<ul>
+							<li class='fragment'>Fortune 500 Financial
+								<ul>
+									<li class='fragment'>Code performance</li>
+									<li class='fragment'>Browser compatibility</li>
+								</ul>
+							</li>
+							<li class='fragment'>
+								1-3 month startup products
+								<ul>
+									<li class='fragment'>"Rapid prototyping" toolchain (Get Stuff Done)</li>
+									<li class='fragment'>Thick clients, Backbone.js, Websockets, cutting edge</li>
+								</ul>
+							</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<h2 class='code'>deferred.history</h2>
+					<ul>
+						<li class='fragment'>November 2009, $.ajax functionality requests</li>
+						<li class='fragment'>Entirely rewritten AJAX by Julian Aubourg</li>
+						<li class='fragment'>Gutted internals, used clever API</li>
+						<li class='fragment'>Suggested that it be exposed as a public object</li>
+						<li class='fragment'>Reworked, and in January, 2010, 1.5 released</li>
+						<li class='fragment'>Implementation 'based on' the CommonJS Promises/A proposal</li>
+						<li class='fragment'>Used internally in jQuery, notably in $.ajax and effects</li>
+						<li class='fragment'>Now it's our tool to figure out how to use.</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2 class='code'>code.inspect()</h2>
+					<p>What the heck is a deferred object?</p>
+					<ul>
+						<li class='fragment'>
+							<span>
+								A Deferred is a state storage object - 'pending' or 'resolved | rejected'
+							</span>
+<pre>
+	<code>
+var def = $.Deferred(); //def.state() === 'pending'
+<span class='fragment'>
+    def.resolve();      //def.state() === 'resolved'
+</span>
+	</code>
+</pre>
+						</li>
+
+						<li class='fragment'>
+							<span>
+								Callback management - Always, Done, Fail
+							</span>
+<pre>
+	<code>
+var def = $.Deferred();
+<span class='fragment'>
+    def.done(function() {
+    	console.log("Deferred resolved!");
+    });
+</span>
+<span class='fragment'>
+    def.resolve(); //logs "Deferred resolved!"
+</span>
+	</code>
+</pre>
+						</li>
+
+					</ul>
+				</section>
+
+				<section>
+					<h2 class='code'>code.inspect()</h2>
+
+					<div class='groups fragment'>
+						<h3>Callback Management: </h3>
+						<ul>
+							<li>deferred.always()</li>
+							<li>deferred.done()</li>
+							<li>deferred.fail()</li>
+						</ul>
+					</div>
+
+					<div class='groups fragment'>
+						<h3>Change State: </h3>
+						<ul>
+							<li>deferred.reject(args)</li>
+							<li>deferred.rejectWith(context, args)</li>
+							<li>deferred.resolve(args)</li>
+							<li>deferred.resolveWith(context, args)</li>
+						</ul>
+					</div>
+
+					<div class='groups fragment'>
+						<h3>Inspect State: </h3>
+						<ul>
+							<li>deferred.state()</li>
+							<li><del>deferred.isRejected()</del></li>
+							<li><del>deferred.isResolved()</del></li>
+						</ul>
+					</div>
+
+					<div class='groups fragment'>
+						<h3>Chaining Utilities: </h3>
+						<ul>
+							<li>deferred.pipe()</li>
+							<li>deferred.then()</li>
+							<li>deferred.when()</li>
+						</ul>
+					</div>
+				</section>
+
+				<section>
+					<h2 class='code'>bringEmOut(examples)</h2>
+				</section> 
+
+
+				<section data-state="problem">
+					<section>
+						<h2>1. Bundling Ajax calls</h2>
+						<div class='fragment'>
+							<h4>Task at hand:</h4>
+							<p>Render a small sidebar that needs data from 3 sources.</p>
+						</div>
+						<div class='fragment'>
+
+						<h4>First attempt:</h4>
+<pre>
+	<code>
+$.ajax({
+  success: function() {<span class='fragment'>
+    $.ajax({</span><span class='fragment'>
+       success: function() {'>
+         $.ajax({
+         //inception-like mess
+      });
+    });
+  }
+});</span>
+	</code>
+</pre>
+					</div>
+					</section>
+
+					<section>
+						<h2>1. Bundling Ajax calls</h2>
+							<h4>Task at hand:</h4>
+							<p>Render a small sidebar that needs data from 3 sources.</p>
+						<div class='fragment'>
+							<h4>Second attempt:</h4>
+						</div>
+						<div class='fragment'>
+<pre>
+	<code>
+var ajaxCallsCompleted = [];<span class='fragment'>
+
+$.ajax({
+  success: function() {
+  	ajaxCallsCompleted.push('gotAddress');
+  	checkDataCalls();
+  }
+});</span>
+<span class='fragment'>
+$.ajax({
+  success: function() {
+  	ajaxCallsCompleted.push('gotTweets');
+  	checkDataCalls();
+  }
+});</span>
+<span class='fragment'>
+$.ajax({
+  success: function() {
+  	ajaxCallsCompleted.push('gotFacebook');
+  	checkDataCalls();
+  }
+});
+</span>
+<span class='fragment'>
+var checkDataCalls = function() {
+  //this checks for all 3 values in the completed array, then 
+  //calls 'render'
+}
+</span>
+	</code>
+</pre>
+					</div>
+					</section>
+
+					<section>
+						<h2>1. Bundling Ajax calls</h2>
+						<h4>Task at hand:</h4>
+						<p>Render a small sidebar that needs data from 3 sources.</p>
+						<div class='fragment'>
+							<h4>Deferreds!</h4>
+						</div>
+
+<pre class='fragment'>
+	<code>
+<span class='fragment'>
+var getAddress = function() {
+  return $.ajax({
+    //returns a deferred, this is key
+  });
+}
+</span>
+<span class='fragment'>
+var getTweets = function() {
+  return $.ajax({
+
+  });
+}
+
+var getFacebook = function() {
+  return $.ajax({
+
+  });
+}
+</span>
+<span class='fragment'>
+$.when( 
+
+  getAddress(), 
+  getTweets(), 
+  getFacebook() 
+
+).then(function(){
+
+  //render sidebar
+
+})
+</span>
+
+	</code>
+</pre>
+
+					</section>
+
+				</section>
+
+				<section data-state="problem">
+					<h2>2. Template Pattern</h2>
+					<div class='fragment'>
+						<h4>Task at hand:</h4>
+						<p>Make a single page app with various pages that load, some of which need data.</p>
+					</div>
+					<h4 class='fragment'>Deferreds!</h4>
+<pre class='fragment'>
+	<code><span class='fragment'>
+var AboutPage = function(){};
+
+AboutPage.prototype = {
+  init: function() {
+    this.def = this.getInfo();
+    return this.def;
+  }
+}</span>
+<span class='fragment'>
+var ContactPage = function(){};
+
+ContactPage.prototype = {
+  init: function() {<span class='fragment'>
+    this.def = $.Deferred().resolve();
+    return this.def;
+    //A deferred not neccessary here, $.when resolved immediately for any type
+  </span>
+  }
+}
+</span>
+<span class='fragment'>
+var changePage = function(page) {
+  page.def.done(function() {
+    page.render();
+  });
+};
+</span>
+	</code>
+</pre>
+
+				</section>
+
+				<section data-state="problem">
+					<h2>3. Cache Money</h2>
+					<div class='fragment'>
+						<h4>Task at hand:</h4>
+						<p>You are using a rate limited API. Don't break your service!</p>
+					</div>
+					<h4 class='fragment'>Deferreds!</h4>
+
+<pre class='fragment'>
+	<code>
+var TweetSearcher = function(username) {<span class='fragment'>
+  var cache = {};</span><span class='fragment'>
+  if (!cache[username]) {
+    cache[username] = $.getJSON('//search.twitter.com/search.json?callback=?&q='+username);
+  }
+
+  return cache[username];
+  </span>
+}
+<span class='fragment'>
+TweetSearcher('alexmcpherson').done(function(data){<span class='fragment'>
+  console.log(data.results);
+  //Made a round trip
+  </span>
+});
+</span>
+<span class='fragment'>
+TweetSearcher('alexmcpherson').done(function(data){<span class='fragment'>
+  console.log(data.results);
+  //Did NOT make a round trip. The deferred passes the same params from the original callback
+  </span>
+});
+</span>
+
+	</code>
+</pre>
+
+				</section>
+
+				<section data-state="problem">
+					<section>
+						<h2>4. Pretty Syntax and DSLs</h2>
+						<div class='fragment'>
+							<h4>Task at hand:</h4>
+							<p>Write pretty code</p>
+						</div>
+
+<pre class='fragment'>
+	<code>
+		<span class='fragment'>
+a) setTimeout(500, myFunction)
+b) setTimeOut(myFunction, 500)
+c) setTimeOut(500, myFunction)
+d) setTimeout(myFunction, 500)<span class='fragment'> <--</span>
+		</span>
+	</code>
+</pre>
+
+					</section>
+
+					<section>
+						<h2>4. Pretty Syntax and DSLs</h2>
+						<div>
+							<h4>Task at hand:</h4>
+							<p>Fix that silly timeout syntax</p>
+						</div>
+
+<pre class='fragment'>
+	<code>
+$.wait = function(duration) {
+  return $.Deferred(function(def) {
+    setTimout(def.resolve, duration);
+  })
+}
+		<span class='fragment'>
+$.wait(1000).then( goMakeTea );
+		</span>
+	</code>
+</pre>
+
+					</section>
+
+					<section>
+						<h2>4. Pretty Syntax and DSLs</h2>
+						<div>
+							<h4>Task at hand:</h4>
+							<p>Write pretty code wrapping an API</p>
+						</div>
+
+<pre class='fragment'>
+	<code>
+var MyTwitter = {
+  search: function (username) {
+    var def = $.ajax({
+      //etc etc
+    });<span class='fragment'>
+    return def.promise();</span>
+  }
+}
+
+<span class='fragment'>
+MyTwitter.search('alexmcpherson').done(renderTweets);
+</span>
+
+<span class='fragment'>
+$.when( 
+
+  MyTwitter.search('alexmcpherson'), 
+  MyTwitter.search('wookiehangover') 
+
+).done(
+  function(def1, def2) {<span class='fragment'>
+    //def1 = [
+    //  {
+    //    actual tweet object
+    //  },
+    //
+    //  'success',
+    //
+    //  {
+    //    //deferred object from first search call
+    //  }
+    //]</span>
+  }
+);
+
+</span>
+	</code>
+</pre>
+
+					</section>
+
+				</section>
+
+				<section data-state="problem">
+					<h2>5. Arbitrary Deferred 'events'</h2>
+					<ul>
+						<li class='fragment'>.progress(args) handlers</li>
+						<li class='fragment'>.notify(args) calls</li>
+					</ul>
+
+<pre class='fragment'>
+	<code>
+var watcher = $.Deferred();
+<span class='fragment'>
+watcher.progress(function(progress, limit) {
+  if (progress == (limit - 50)) {
+    console.log('Halfway there!');
+  }
+});
+</span>
+<span class='fragment'>
+watcher.done(function(){
+  console.log('Done, from done handler!');
+});
+</span>
+<span class='fragment'>
+var slowCounter = function(start, limit) {
+  
+  watcher.notify(start, limit);
+
+  if (start == limit) {
+    watcher.resolve();
+    return;
+  }
+  
+  setTimeout(function() {
+    slowCounter(start + 1, limit);
+  }, 10);
+
+}
+</span>
+	</code>
+</pre>
+
+				</section>
+
+				<section data-state="problem">
+					<section>
+						<h2>6. Managing Animations</h2>
+						<p>All helper methods attach promises to their nodes</p>
+						<ul class='fragment'>
+							<li>.animate()</li>
+							<li>.fadeIn()</li>
+							<li>.fadeOut()</li>
+							<li>.hide()</li>
+							<li>.show()</li>
+							<li>.slideUp()</li>
+							<li>.slideDown()</li>
+						</ul>
+					</section>
+
+					<section>
+						<h2>6. Managing Animations</h2>
+
+<pre class='fragment'>
+	<code><span class='fragment'>
+var complexRemove = function() {
+  var defs = [];
+</span><span class='fragment'>
+  defs.push( $('h1').delay(Math.random()*5000).fadeOut() );
+</span><span class='fragment'>
+  defs.push( $('div').fadeIn(100).delay(200).slideDown() );
+</span><span class='fragment'>
+  return $.when.apply(null, defs);
+}</span>
+
+<span class='fragment'>
+$.when( complexRemove() ).done(function() {
+  window.close();
+});
+</span>
+	</code>
+</pre>
+
+					</section>
+
+				</section>
+
+				<section>
+					<section>
+						<h2>Things I didn't even mention but are still awesome!</h2>
+						<ul>
+							<li class='fragment'>Registering multiple callbacks!</li>
+							<li class='fragment'>Post-resolution binding!</li>
+							<li class='fragment'>Helpful .then(d, f) shortcut syntax!</li>
+							<li class='fragment'>Dependent AJAX calls!</li>
+							<li class='fragment'>Memoizing expensive operations!</li>
+							<li class='fragment'>Implementing a publisher/subscriber pattern!</li>
+						</ul>
+					</section>
+				</section>
+
+				<section data-state="problem">
+					<section>
+						<h2>Keys for success: </h2>
+						<ol>
+							<li class='fragment'>When in doubt, return a deferred</li>
+							<li class='fragment'>Better yet, return a def.promise()</li>
+							<li class='fragment'>Powerful as properties on an object</li>
+							<li class='fragment'>Make your life easier</li>
+							<li class='fragment'>Make JS prettier</li>
+						</ol>
+					</section>
+				</section>
+
+				<section>
+					<h2>talk.resolve();</h2>
+
+					<p>Quick Left - quickleft.com</p>
+					<p>@alexmcpherson</p>
+					<p>McPhersonIndustries.com</p>
+
+					<h4 class='credits'>Credits: </h4>
+					<ul>
+						<li>j@ubourg</li>
+						<li>http://bit.ly/JvD71E [MSDN Addy and Julian article]</li>
+						<li>http://bit.ly/MIOIK2 [Intridea 'Fun with jQuery Deferred']</li>
+						<li>Quick Left (esp. Nico and Sam!)</li>
+					</ul>
+				</section>
+
+			</div>
+
+			<!-- The navigational controls UI -->
+			<aside class="controls">
+				<a class="left" href="#">&#x25C4;</a>
+				<a class="right" href="#">&#x25BA;</a>
+				<a class="up" href="#">&#x25B2;</a>
+				<a class="down" href="#">&#x25BC;</a>
+			</aside>
+
+			<!-- Displays presentation progress, max value changes via JS to reflect # of slides -->
+			<div class="progress"><span></span></div>
+			
+		</div>
+
+		<!-- Optional libraries for code syntax highlighting and classList support in IE9 -->
+		<script src="lib/highlight.js"></script>
+		<script src="lib/classList.js"></script>
+		
+		<script src="js/reveal.js"></script>
+		
+		<script>
+			// Parse the query string into a key/value object
+			var query = {};
+			location.search.replace( /[A-Z0-9]+?=(\w*)/gi, function(a) {
+				query[ a.split( '=' ).shift() ] = a.split( '=' ).pop();
+			} );
+
+			// Fires when a slide with data-state=customevent is activated
+			Reveal.addEventListener( 'customevent', function() {
+				alert( '"customevent" has fired' );
+			} );
+
+			// Fires each time a new slide is activated
+			Reveal.addEventListener( 'slidechanged', function( event ) {
+				// event.previousSlide, event.currentSlide, event.indexh, event.indexv
+			} );
+
+			Reveal.initialize({
+				// Display controls in the bottom right corner
+				controls: true,
+
+				// Display a presentation progress bar
+				progress: true,
+
+				// If true; each slide will be pushed to the browser history
+				history: true,
+
+				// Loops the presentation, defaults to false
+				loop: false,
+
+				// Flags if mouse wheel navigation should be enabled
+				mouseWheel: true,
+
+				// Apply a 3D roll to links on hover
+				rollingLinks: true,
+
+				// UI style
+				theme: query.theme || 'neon', // default/neon
+
+				// Transition style
+				transition: query.transition || 'default' // default/cube/page/concave/linear(2d)
+			});
+
+			hljs.initHighlightingOnLoad();
+		</script>
+
+	</body>
+</html>
